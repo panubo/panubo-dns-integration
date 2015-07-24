@@ -1,2 +1,2 @@
 # panubo-dns-integration
-Bind DNS integration using CoucDB transport
+Bind DNS integration using CouchDB transport
