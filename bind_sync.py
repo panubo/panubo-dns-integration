@@ -43,13 +43,13 @@ def zone_update(name, data, zone_dir):
     os.rename("%s.tmp" % zone_file, zone_file)
 
     if created:
-        cmd = ['/usr/bin/rndc', 'addzone', name]
+        cmd = ['/usr/sbin/rndc', 'addzone', name]
         try:
             subprocess.check_call(cmd, cwd=zone_dir, shell=False, env=os.environ.copy())
         except subprocess.CalledProcessError as e:
             raise Exception("Error running '%s'. Return %s" % (cmd, e.returncode))
     else:
-        cmd = ['/usr/bin/rndc', 'reload', name]
+        cmd = ['/usr/sbin/rndc', 'reload', name]
         try:
             subprocess.check_call(cmd, cwd=zone_dir, shell=False, env=os.environ.copy())
         except subprocess.CalledProcessError as e:
