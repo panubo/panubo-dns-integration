@@ -2,6 +2,8 @@ FROM panubo/python-bureaucrat
 
 COPY . /srv/git
 
+RUN yum -y install bind bind-utils && yum clean all
+
 USER www
 
 RUN source /srv/ve27/bin/activate && cd /srv/git && pip install -r requirements.txt
