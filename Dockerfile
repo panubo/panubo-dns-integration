@@ -1,14 +1,17 @@
 FROM panubo/python-bureaucrat
 
-COPY . /srv/git
-
 RUN yum -y install bind bind-utils && yum clean all
+
+COPY . /srv/git
 
 USER www
 
 RUN source /srv/ve27/bin/activate && cd /srv/git && pip install -r requirements.txt
 
 USER root
+
+COPY rndc.conf /etc/rndc.conf
+COPY voltgrid.conf /usr/local/etc/voltgrid.conf
 
 ENTRYPOINT ["/srv/git/entry.sh"]
 # Because we've defined the entry point we need to redefine the default CMD
