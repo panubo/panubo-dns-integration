@@ -87,10 +87,10 @@ def main(db_name, db_user, db_pass, db_host, sequence_file, zone_dir):
         for change in stream:
             domain = change['id']
             if change.get('deleted', False) is True:
-                click.echo("Deleted %s" % domain)
+                click.echo("Deleted %s." % domain)
                 zone_delete(domain, zone_dir)
             else:
-                click.echo("Change %s" % domain)
+                click.echo("Got change for %s." % domain)
                 doc = db.get(docid=domain)
                 zone_update(domain, doc['data'], zone_dir)
 
