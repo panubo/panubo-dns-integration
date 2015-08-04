@@ -88,11 +88,17 @@ def main(db_name, db_user, db_pass, db_host, sequence_file, zone_dir):
             domain = change['id']
             if change.get('deleted', False) is True:
                 click.echo("Deleted %s." % domain)
-                zone_delete(domain, zone_dir)
+                try:
+                    zone_delete(domain, zone_dir)
+                except Exception, e:
+                    click.echo(e)
             else:
                 click.echo("Got change for %s." % domain)
                 doc = db.get(docid=domain)
-                zone_update(domain, doc['data'], zone_dir)
+                try:
+                    zone_update(domain, doc['data'], zone_dir)
+                except Exception, e:
+                    click.echo(e)
 
             sequence_write(sequence_file, change['seq'])   # Keep track of our sync point
 
