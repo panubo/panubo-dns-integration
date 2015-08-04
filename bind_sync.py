@@ -43,7 +43,7 @@ def zone_update(name, data, zone_dir):
     os.rename("%s.tmp" % zone_file, zone_file)
 
     if created:
-        cmd = ['/usr/sbin/rndc', 'addzone', name]
+        cmd = ['/usr/sbin/rndc', 'addzone', name, '{type master; file "%s";};' % zone_file]
         try:
             subprocess.check_call(cmd, cwd=zone_dir, shell=False, env=os.environ.copy())
         except subprocess.CalledProcessError as e:
