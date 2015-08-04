@@ -58,12 +58,12 @@ def zone_update(name, data, zone_dir):
 
 def zone_delete(name, zone_dir):
     zone_file = os.path.join(zone_dir, "%s.zone" % name)
-    cmd = ['/usr/sbin/rndc', 'delzone', zone_file, name]
+    cmd = ['/usr/sbin/rndc', 'delzone', name]
     try:
         subprocess.check_call(cmd, cwd=zone_dir, shell=False, env=os.environ.copy())
     except subprocess.CalledProcessError as e:
         raise Exception("Error running '%s'. Return %s" % (cmd, e.returncode))
-    os.remove(os.path.join(zone_dir, name))
+    os.remove(zone_file)
 
 
 @click.command()
