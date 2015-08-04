@@ -57,7 +57,8 @@ def zone_update(name, data, zone_dir):
 
 
 def zone_delete(name, zone_dir):
-    cmd = ['/usr/bin/rndc', 'delzone', name]
+    zone_file = os.path.join(zone_dir, "%s.zone" % name)
+    cmd = ['/usr/sbin/rndc', 'delzone', zone_file, name]
     try:
         subprocess.check_call(cmd, cwd=zone_dir, shell=False, env=os.environ.copy())
     except subprocess.CalledProcessError as e:
