@@ -1,6 +1,10 @@
 FROM panubo/python-bureaucrat
 
-RUN yum -y install bind bind-utils && yum clean all
+RUN yum -y install bind bind-utils && \
+    # Allow www user to enter the directory
+    chmod o+x /var/named && \
+    # Cleanup \
+    yum clean all
 
 COPY . /srv/git
 
