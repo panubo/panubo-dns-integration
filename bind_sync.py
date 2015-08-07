@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import os
+import ssl
 import subprocess
 import click
 from couchdbkit import Server
@@ -70,15 +71,20 @@ def zone_delete(name, zone_dir):
 @click.option('--db-name', help='CouchDB Name', required=True, envvar='COUCHDB_NAME')
 @click.option('--db-user', help='CouchDB User', required=True, envvar='COUCHDB_USER')
 @click.option('--db-pass', help='CouchDB Password', required=True, envvar='COUCHDB_PASS')
-@click.option('--db-host', help='CouchDB HOST', required=True, envvar='COUCHDB_HOST')
+@click.option('--db-host', help='CouchDB HOST URI', required=True, envvar='COUCHDB_URI')
+@click.option('--ca_certs', help='TLS CA Cert', envvar='TLS_CACERT')
+@click.option('--certfile', help='TLS Client Cert', envvar='TLS_CLIENT_CERT')
+@click.option('--keyfile', help='TLS Client Key', envvar='TLS_CLIENT_KEY')
 @click.option('--sequence-file', help='Sequence File', default='/var/tmp/bind_sync.sequence')
 @click.option('--zone-dir', help='Zone File Directory', default='/var/named/masters/')
-def main(db_name, db_user, db_pass, db_host, sequence_file, zone_dir):
+def main(db_name, db_user, db_pass, db_host, sequence_file, zone_dir, **tls_args):
     # Starting Sequence for change stream
     sequence = sequence_read(sequence_file)
     click.echo('Skipping %s changes.' % sequence)
     # CouchDB Connection
-    auth = CouchdbResource(filters=[BasicAuth(db_user, db_pass)])
+    tls_args['cert_reqs'] = ssl.CERT_REQUIRED
+    tls_args['ssl_version'] = ssl.PROTOCOL_TLSv1_2
+    auth = CouchdbResource(filters=[BasicAuth(db_user, db_pass)], **tls_args)
     server = Server(uri=db_host, resource_instance=auth)
     db = server[db_name]
 
