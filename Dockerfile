@@ -1,22 +1,20 @@
-FROM panubo/python-bureaucrat
+FROM python:2.7
 
-RUN yum -y install bind bind-utils && \
-    # Allow www user to enter the directory
-    chmod o+x /var/named && \
-    # Cleanup \
-    yum clean all
+RUN mkdir -p /usr/src/app
+WORKDIR /usr/src/app
 
-COPY . /srv/git
+RUN groupadd -g 108 nsd && \
+  apt-get update && \
+  apt-get -y install nsd openssl && \
+  apt-get clean && rm -rf /var/lib/apt/lists/*
 
-USER www
+COPY requirements.txt /usr/src/app/
+RUN pip install --no-cache-dir -r requirements.txt
 
-RUN source /srv/ve27/bin/activate && cd /srv/git && pip install -r requirements.txt
+COPY entry.sh /
+ENTRYPOINT ["/entry.sh"]
 
-USER root
+COPY bind_sync.py /usr/src/app/
 
-COPY rndc.conf /etc/rndc.conf
-COPY voltgrid.conf /usr/local/etc/voltgrid.conf
-
-ENTRYPOINT ["/srv/git/entry.sh"]
-# Because we've defined the entry point we need to redefine the default CMD
-CMD ["/usr/local/bin/voltgrid.py", "/srv/ve27/bin/bureaucrat", "init", "--no-create-pid", "--venv", "/srv/ve27", "--envfile", "/srv/env", "--app", "/srv/git", "--logpath", "-"]
+USER nsd
+CMD ["./bind_sync.py","--zone-dir","/var/lib/nsd/zones","--sequence-file","/var/lib/nsd/sync.sequence"]

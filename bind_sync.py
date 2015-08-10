@@ -44,13 +44,13 @@ def zone_update(name, data, zone_dir):
     os.rename("%s.tmp" % zone_file, zone_file)
 
     if created:
-        cmd = ['/usr/sbin/rndc', 'addzone', name, '{type master; file "%s";};' % zone_file]
+        cmd = ['/usr/sbin/nsd-control', 'addzone', name, 'zone']
         try:
             subprocess.check_call(cmd, cwd=zone_dir, shell=False, env=os.environ.copy())
         except subprocess.CalledProcessError as e:
             raise Exception("Error running '%s'. Return %s" % (cmd, e.returncode))
     else:
-        cmd = ['/usr/sbin/rndc', 'reload', name]
+        cmd = ['/usr/sbin/nsd-control', 'reload', name]
         try:
             subprocess.check_call(cmd, cwd=zone_dir, shell=False, env=os.environ.copy())
         except subprocess.CalledProcessError as e:
@@ -59,7 +59,7 @@ def zone_update(name, data, zone_dir):
 
 def zone_delete(name, zone_dir):
     zone_file = os.path.join(zone_dir, "%s.zone" % name)
-    cmd = ['/usr/sbin/rndc', 'delzone', name]
+    cmd = ['/usr/sbin/nsd-control', 'delzone', name]
     try:
         subprocess.check_call(cmd, cwd=zone_dir, shell=False, env=os.environ.copy())
     except subprocess.CalledProcessError as e:
