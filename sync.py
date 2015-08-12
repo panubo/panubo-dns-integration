@@ -30,7 +30,7 @@ def sequence_write(sequence_file, sequence):
 
 
 def zone_update(name, data, zone_dir):
-    """ Write out zone file and reload bind """
+    """ Write out zone file and reload name service """
 
     zone_file = os.path.join(zone_dir, "%s.zone" % name)
 
@@ -75,7 +75,7 @@ def zone_delete(name, zone_dir):
 @click.option('--ca_certs', help='TLS CA Cert', envvar='TLS_CACERT')
 @click.option('--certfile', help='TLS Client Cert', envvar='TLS_CLIENT_CERT')
 @click.option('--keyfile', help='TLS Client Key', envvar='TLS_CLIENT_KEY')
-@click.option('--sequence-file', help='Sequence File', default='/var/tmp/bind_sync.sequence')
+@click.option('--sequence-file', help='Sequence File', default='/var/tmp/sync.sequence')
 @click.option('--zone-dir', help='Zone File Directory', default='/var/named/masters/')
 def main(db_name, db_user, db_pass, db_host, sequence_file, zone_dir, **tls_args):
     # Starting Sequence for change stream

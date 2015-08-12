@@ -18,7 +18,7 @@ setup(
         'Programming Language :: Python',
     ],
     url='https://github.com/panubo/panubo-dns-integration',
-    scripts=['bind_sync.py'],
+    scripts=['sync.py'],
     zip_safe=False,
     install_requires=['click==4.1', 'couchdbkit==0.6.5', 'requests==2.3.0',],
     tests_require=['pytest', 'pytest-capturelog'],

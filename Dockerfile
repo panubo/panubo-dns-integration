@@ -14,7 +14,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY entry.sh /
 ENTRYPOINT ["/entry.sh"]
 
-COPY bind_sync.py /usr/src/app/
+COPY sync.py /usr/src/app/
 
 USER nsd
-CMD ["./bind_sync.py","--zone-dir","/var/lib/nsd/zones","--sequence-file","/var/lib/nsd/sync.sequence"]
+CMD ["./sync.py","--zone-dir","/var/lib/nsd/zones","--sequence-file","/var/lib/nsd/sync.sequence"]
