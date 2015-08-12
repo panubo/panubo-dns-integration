@@ -93,21 +93,24 @@ def main(db_name, db_user, db_pass, db_host, sequence_file, zone_dir, **tls_args
 
         for change in stream:
             domain = change['id']
+            seq = change['seq']
             if change.get('deleted', False) is True:
-                click.echo("Deleted %s." % domain)
+                click.echo("%s Delete for %s." % (seq, domain))
                 try:
                     zone_delete(domain, zone_dir)
                 except Exception, e:
+                    # TODO: Add some alerting here
                     click.echo(e)
             else:
-                click.echo("Got change for %s." % domain)
-                doc = db.get(docid=domain)
+                click.echo("%s Create/Update for %s." % (seq, domain))
                 try:
+                    doc = db.get(docid=domain)
                     zone_update(domain, doc['data'], zone_dir)
                 except Exception, e:
+                    # TODO: Add some alerting here
                     click.echo(e)
 
-            sequence_write(sequence_file, change['seq'])   # Keep track of our sync point
+            sequence_write(sequence_file, seq)   # Keep track of our sync point
 
 if __name__ == '__main__':
     main()
