@@ -5,6 +5,7 @@ import ssl
 import subprocess
 import click
 from couchdbkit import Server
+from couchdbkit import Consumer
 from couchdbkit.changes import ChangesStream
 from couchdbkit.resource import CouchdbResource
 from restkit import BasicAuth
@@ -87,6 +88,21 @@ def main(db_name, db_user, db_pass, db_host, sequence_file, zone_dir, **tls_args
     auth = CouchdbResource(filters=[BasicAuth(db_user, db_pass)], **tls_args)
     server = Server(uri=db_host, resource_instance=auth)
     db = server[db_name]
+
+    if sequence == 0:
+        click.echo('Fast track syncing all zones...')
+        c = Consumer(db)
+        result = c.fetch(descending=True, limit=1)
+        # fasttrack to this seq
+        sequence = result['last_seq']
+        # Go get all the current zones.
+        zones = c.fetch()
+        for zone in zones['results']:
+            domain = zone['id']
+            doc = db.get(docid=domain)
+            zone_update(domain, doc['data'], zone_dir)
+        sequence_write(sequence_file, sequence)  # Keep track of our sync point
+        click.echo('Fast track syncing done')
 
     with ChangesStream(db, since=sequence, feed='continuous', heartbeat=True) as stream:
         click.echo('Waiting for changes...')
