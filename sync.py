@@ -8,6 +8,7 @@ from couchdbkit import Server
 from couchdbkit import Consumer
 from couchdbkit.changes import ChangesStream
 from couchdbkit.resource import CouchdbResource
+from couchdbkit.exceptions import ResourceNotFound
 from restkit import BasicAuth
 
 
@@ -99,8 +100,14 @@ def main(db_name, db_user, db_pass, db_host, sequence_file, zone_dir, **tls_args
         zones = c.fetch()
         for zone in zones['results']:
             domain = zone['id']
-            doc = db.get(docid=domain)
-            zone_update(domain, doc['data'], zone_dir)
+            try:
+                doc = db.get(docid=domain)
+            except ResourceNotFound, e:
+                click.echo('%s not found' % domain)
+            except Exception, e:
+                click.echo('Unknown exception quashed: %s' % e)
+            else:
+                zone_update(domain, doc['data'], zone_dir)
         sequence_write(sequence_file, sequence)  # Keep track of our sync point
         click.echo('Fast track syncing done')
 
