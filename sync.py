@@ -103,9 +103,7 @@ def main(db_name, db_user, db_pass, db_host, sequence_file, zone_dir, **tls_args
             try:
                 doc = db.get(docid=domain)
             except ResourceNotFound, e:
-                click.echo('%s not found' % domain)
-            except Exception, e:
-                click.echo('Unknown exception quashed: %s' % e)
+                click.echo('%s not found (this is normal if the zone was deleted)' % domain)
             else:
                 zone_update(domain, doc['data'], zone_dir)
         sequence_write(sequence_file, sequence)  # Keep track of our sync point
