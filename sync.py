@@ -112,5 +112,8 @@ def main(db_name, db_user, db_pass, db_host, sequence_file, zone_dir, **tls_args
 
             sequence_write(sequence_file, seq)   # Keep track of our sync point
 
+    click.echo("Stream Closed? Finished listening for changes!")
+
+
 if __name__ == '__main__':
     main()
