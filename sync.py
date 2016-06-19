@@ -94,7 +94,7 @@ def main(db_name, db_user, db_pass, db_host, sequence_file, zone_dir, **tls_args
         click.echo('Fast track syncing all zones...')
         c = Consumer(db)
         result = c.fetch(descending=True, limit=1)
-        # fasttrack to this seq
+        # Fast track to this sequence
         sequence = result['last_seq']
         # Go get all the current zones.
         zones = c.fetch()
@@ -111,27 +111,29 @@ def main(db_name, db_user, db_pass, db_host, sequence_file, zone_dir, **tls_args
 
     with ChangesStream(db, since=sequence, feed='continuous', heartbeat=True) as stream:
         click.echo('Waiting for changes...')
-
-        for change in stream:
-            domain = change['id']
-            seq = change['seq']
-            if change.get('deleted', False) is True:
-                click.echo("%s Delete for %s." % (seq, domain))
-                try:
-                    zone_delete(domain, zone_dir)
-                except Exception, e:
-                    # TODO: Add some alerting here
-                    click.echo(e)
-            else:
-                click.echo("%s Create/Update for %s." % (seq, domain))
-                try:
-                    doc = db.get(docid=domain)
-                    zone_update(domain, doc['data'], zone_dir)
-                except Exception, e:
-                    # TODO: Add some alerting here
-                    click.echo(e)
-
-            sequence_write(sequence_file, seq)   # Keep track of our sync point
+        try:
+            for change in stream:
+                domain = change['id']
+                seq = change['seq']
+                if change.get('deleted', False) is True:
+                    click.echo("%s Delete for %s." % (seq, domain))
+                    try:
+                        zone_delete(domain, zone_dir)
+                    except Exception as e:
+                        # TODO: Add some alerting here
+                        click.echo(e)
+                else:
+                    click.echo("%s Create/Update for %s." % (seq, domain))
+                    try:
+                        doc = db.get(docid=domain)
+                        zone_update(domain, doc['data'], zone_dir)
+                    except Exception as e:
+                        # TODO: Add some alerting here
+                        click.echo(e)
+                sequence_write(sequence_file, seq)   # Keep track of our sync point
+        except Exception as e:
+            # TODO: Add some alerting here
+            exit_with_error(e)
 
     click.echo("Stream Closed? Finished listening for changes!")
 
