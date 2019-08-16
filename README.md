@@ -1,6 +1,10 @@
-# Panubo DNS Integration
+# Deprecation Notice!
 
-[![Docker Repository on Quay.io](https://quay.io/repository/panubo/dns-integration/status "Docker Repository on Quay.io")](https://quay.io/repository/panubo/dns-integration)
+NB: This project is no longer maintained and the repository has been archived.
+
+---
+
+# Panubo DNS Integration
 
 NSD DNS integration using CouchDB transport.
 
